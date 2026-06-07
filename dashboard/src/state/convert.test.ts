@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { QuestionStateContext } from './questionState';
-import { toOpenFiscaHousehold } from './convert';
+import { toOpenFiscaHousehold, toFrontendHousehold } from './convert';
 
 const boolField = () => ({
   あなた: [{ type: 'Boolean' as const, selection: undefined }],
@@ -4055,4 +4055,272 @@ test('親の災害による負傷が未回答の場合設定されない', () =>
   const actual = toOpenFiscaHousehold({ context, currentDate });
 
   expect(actual.世帯員.親1).not.toHaveProperty('災害による負傷の療養期間');
+});
+
+// toFrontendHousehold のテスト
+
+test('困りごとが未選択の場合、制度は空である', () => {
+  const context = defaultContext();
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度).toEqual({});
+});
+
+test('困りごとに「仕事について」が含まれる場合、就労関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '仕事について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['雇用保険（失業手当）']).toBe(true);
+  expect(actual.制度['求職者支援制度（職業訓練・ハロートレーニング）']).toBe(
+    true
+  );
+  expect(actual.制度['住宅支援（住居確保給付金）']).toBe(true);
+  expect(
+    actual.制度['健康保険・年金の減免制度（国民健康保険に加入している場合）']
+  ).toBe(true);
+  expect(
+    actual.制度['健康保険・年金の減免制度（国民年金に加入している場合）']
+  ).toBe(true);
+  expect(actual.制度['自立相談支援機関による相談支援']).toBe(true);
+});
+
+test('困りごとに「妊娠について」が含まれる場合、妊娠関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '妊娠について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['妊婦健診の助成']).toBe(true);
+  expect(actual.制度['産前産後休業（産休）']).toBe(true);
+  expect(actual.制度['低所得世帯向けの入院助産制度']).toBe(true);
+  expect(
+    actual.制度['健康保険・年金の減免制度（国民健康保険に加入している場合）']
+  ).toBe(true);
+  expect(
+    actual.制度['健康保険・年金の減免制度（国民年金に加入している場合）']
+  ).toBe(true);
+  expect(
+    actual.制度[
+      '健康保険・年金の減免制度（共済組合、協会けんぽまたは健康保険組合に加入している場合）'
+    ]
+  ).toBe(true);
+});
+
+test('困りごとに「妊娠について」が含まれ居住が埼玉県富士見市の場合、富士見市独自の制度も設定される', () => {
+  const context = defaultContext();
+  context['寝泊まりしている地域'].あなた[0].prefecure = '埼玉県';
+  context['寝泊まりしている地域'].あなた[0].municipality = '富士見市';
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '妊娠について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['富士見市出産・子育て応援給付金']).toBe(true);
+});
+
+test('困りごとに「妊娠について」が含まれるが居住が富士見市でない場合、富士見市独自の制度は設定されない', () => {
+  const context = defaultContext();
+  context['寝泊まりしている地域'].あなた[0].prefecure = '埼玉県';
+  context['寝泊まりしている地域'].あなた[0].municipality = 'さいたま市';
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '妊娠について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度).not.toHaveProperty('富士見市出産・子育て応援給付金');
+});
+
+test('困りごとに「出産や子育てについて」が含まれる場合、出産・育児関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '出産や子育てについて',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['出産育児一時金（国民健康保険に加入している場合）']).toBe(
+    true
+  );
+  expect(
+    actual.制度[
+      '出産育児一時金（共済組合、協会けんぽまたは健康保険組合に加入している場合）'
+    ]
+  ).toBe(true);
+  expect(actual.制度['出産手当金（会社員・公務員向け）']).toBe(true);
+  expect(actual.制度['育児休業給付金']).toBe(true);
+  expect(actual.制度['高額療養費制度（国民健康保険に加入している場合）']).toBe(
+    true
+  );
+  expect(
+    actual.制度[
+      '高額療養費制度（共済組合、協会けんぽまたは健康保険組合に加入している場合）'
+    ]
+  ).toBe(true);
+  expect(
+    actual.制度['健康保険・年金の減免制度（国民健康保険に加入している場合）']
+  ).toBe(true);
+  expect(
+    actual.制度['健康保険・年金の減免制度（国民年金に加入している場合）']
+  ).toBe(true);
+  expect(
+    actual.制度[
+      '健康保険・年金の減免制度（共済組合、協会けんぽまたは健康保険組合に加入している場合）'
+    ]
+  ).toBe(true);
+  expect(actual.制度['ひとり親家庭等医療費助成']).toBe(true);
+  expect(actual.制度['未熟児養育医療費助成']).toBe(true);
+  expect(actual.制度['小児慢性特定疾患医療費助成']).toBe(true);
+});
+
+test('困りごとに「出産や子育てについて」が含まれ居住が埼玉県富士見市の場合、富士見市独自の制度も設定される', () => {
+  const context = defaultContext();
+  context['寝泊まりしている地域'].あなた[0].prefecure = '埼玉県';
+  context['寝泊まりしている地域'].あなた[0].municipality = '富士見市';
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '出産や子育てについて',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['富士見市産後ケア事業']).toBe(true);
+  expect(actual.制度['富士見市こども医療費助成']).toBe(true);
+  expect(actual.制度['富士見市出産・子育て応援給付金']).toBe(true);
+});
+
+test('困りごとに「出産や子育てについて」が含まれるが居住が富士見市でない場合、富士見市独自の制度は設定されない', () => {
+  const context = defaultContext();
+  context['寝泊まりしている地域'].あなた[0].prefecure = '埼玉県';
+  context['寝泊まりしている地域'].あなた[0].municipality = 'さいたま市';
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '出産や子育てについて',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度).not.toHaveProperty('富士見市産後ケア事業');
+  expect(actual.制度).not.toHaveProperty('富士見市こども医療費助成');
+  expect(actual.制度).not.toHaveProperty('富士見市出産・子育て応援給付金');
+});
+
+test('困りごとに「進学について」が含まれる場合、進学関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '進学について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['給付型奨学金']).toBe(true);
+});
+
+test('困りごとに「進学について」が含まれ居住が埼玉県の場合、埼玉県独自の制度も設定される', () => {
+  const context = defaultContext();
+  context['寝泊まりしている地域'].あなた[0].prefecure = '埼玉県';
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '進学について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['埼玉県母子寡婦福祉資金貸付金']).toBe(true);
+  expect(actual.制度['埼玉県私立学校の父母負担軽減']).toBe(true);
+});
+
+test('困りごとに「進学について」が含まれるが居住が埼玉県でない場合、埼玉県独自の制度は設定されない', () => {
+  const context = defaultContext();
+  context['寝泊まりしている地域'].あなた[0].prefecure = '東京都';
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '進学について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度).not.toHaveProperty('埼玉県母子寡婦福祉資金貸付金');
+  expect(actual.制度).not.toHaveProperty('埼玉県私立学校の父母負担軽減');
+});
+
+test('困りごとに「介護について」が含まれる場合、介護関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '介護について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['介護保険制度']).toBe(true);
+  expect(actual.制度['介護休業制度']).toBe(true);
+  expect(actual.制度['介護保険料の減免']).toBe(true);
+  expect(actual.制度['老人介護手当']).toBe(true);
+  expect(actual.制度['介護保険サービス利用者負担助成金']).toBe(true);
+});
+
+test('困りごとに「入院について」が含まれる場合、入院関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '入院について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['高額療養費制度（国民健康保険に加入している場合）']).toBe(
+    true
+  );
+  expect(
+    actual.制度[
+      '高額療養費制度（共済組合、協会けんぽまたは健康保険組合に加入している場合）'
+    ]
+  ).toBe(true);
+  expect(actual.制度['医療費控除（確定申告）']).toBe(true);
+});
+
+test('困りごとに「病気や障害について」が含まれる場合、障害関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '病気や障害について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['身体障害者手帳・療育手帳・精神障害者保健福祉手帳']).toBe(
+    true
+  );
+  expect(actual.制度['自立支援医療']).toBe(true);
+  expect(actual.制度['重度障害者医療費助成']).toBe(true);
+  expect(actual.制度['指定難病医療給付制度']).toBe(true);
+  expect(actual.制度['障がい者向けの就労支援']).toBe(true);
+});
+
+test('困りごとに「離婚について」が含まれる場合、離婚関連制度が設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '離婚について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['ひとり親家庭等医療費助成']).toBe(true);
+  expect(actual.制度['養育費に関する公正証書等の作成費用補助']).toBe(true);
+  expect(actual.制度['子どものための養育費相談']).toBe(true);
+});
+
+test('複数の困りごとが選択された場合、それぞれの制度がすべて設定される', () => {
+  const context = defaultContext();
+  (context['困りごとはありますか？'].あなた[0] as any).selection = [
+    '仕事について',
+    '入院について',
+  ];
+
+  const actual = toFrontendHousehold({ context });
+
+  expect(actual.制度['雇用保険（失業手当）']).toBe(true);
+  expect(actual.制度['医療費控除（確定申告）']).toBe(true);
 });
