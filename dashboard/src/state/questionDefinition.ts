@@ -3,20 +3,20 @@
 import { HouseholdMemberAttrs } from './household';
 
 // NOTE: テンプレート生成のための設定値なのでas constでreadonlyにする
-export const addressQuestionDefinitions = {
+const addressQuestionDefinitions = {
   寝泊まりしている地域: {
     type: 'Address',
     // 選択肢は都道府県市区町村.jsonから取得
   },
 } as const;
 
-export const ageQuestionDefinitions = {
+const ageQuestionDefinitions = {
   年齢: {
     type: 'Age',
   },
 } as const;
 
-export const amountOfMoneyQuestionDefinitions = {
+const amountOfMoneyQuestionDefinitions = {
   年収: {
     type: 'AmountOfMoney',
   },
@@ -28,7 +28,7 @@ export const amountOfMoneyQuestionDefinitions = {
   },
 } as const;
 
-export const booleanQuestionDefinitions = {
+const booleanQuestionDefinitions = {
   '家を借りたいですか？': { type: 'Boolean' },
   '現在仕事をしていますか？': { type: 'Boolean' },
   '6か月以内に新しい仕事を始めましたか？': { type: 'Boolean' },
@@ -69,7 +69,7 @@ export const booleanQuestionDefinitions = {
   '災害で生計維持者が亡くなりましたか？': { type: 'Boolean' },
 } as const;
 
-export const personNumQuestionDefinitions = {
+const personNumQuestionDefinitions = {
   子どもの人数: { type: 'PersonNum' },
   親の人数: { type: 'PersonNum' },
   // 能登半島地震被災者支援制度見積もり用
@@ -192,7 +192,7 @@ export const multipleSelectionQuestionDefinitions = {
   },
 } as const;
 
-export const questionDefinitions = {
+const questionDefinitions = {
   ...addressQuestionDefinitions,
   ...ageQuestionDefinitions,
   ...amountOfMoneyQuestionDefinitions,
@@ -220,25 +220,23 @@ export type QuestionKey =
   | SelectionQuestionKey
   | MultipleSelectionQuestionKey;
 
-export const addressQuestionKeys = Object.keys(
+const addressQuestionKeys = Object.keys(
   addressQuestionDefinitions
 ) as AddressQuestionKey[];
-export const ageQuestionKeys = Object.keys(
-  ageQuestionDefinitions
-) as AgeQuestionKey[];
-export const amountOfMoneyQuestionKeys = Object.keys(
+const ageQuestionKeys = Object.keys(ageQuestionDefinitions) as AgeQuestionKey[];
+const amountOfMoneyQuestionKeys = Object.keys(
   amountOfMoneyQuestionDefinitions
 ) as AmountOfMoneyQuestionKey[];
-export const booleanQuestionKeys = Object.keys(
+const booleanQuestionKeys = Object.keys(
   booleanQuestionDefinitions
 ) as BooleanQuestionKey[];
-export const personNumQuestionKeys = Object.keys(
+const personNumQuestionKeys = Object.keys(
   personNumQuestionDefinitions
 ) as PersonNumQuestionKey[];
-export const selectionQuestionKeys = Object.keys(
+const selectionQuestionKeys = Object.keys(
   selectionQuestionDefinitions
 ) as SelectionQuestionKey[];
-export const multipleSelectionQuestionKeys = Object.keys(
+const multipleSelectionQuestionKeys = Object.keys(
   multipleSelectionQuestionDefinitions
 ) as MultipleSelectionQuestionKey[];
 export const questionKeys = Object.keys(questionDefinitions) as QuestionKey[];
