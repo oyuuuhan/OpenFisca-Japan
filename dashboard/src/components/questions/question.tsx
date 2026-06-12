@@ -29,6 +29,7 @@ import {
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   currentDateAtom,
+  frontendHouseholdAtom,
   householdAtom,
   questionValidatedAtom,
   showsValidationErrorAtom,
@@ -36,7 +37,7 @@ import {
 import { SelectionQuestionTemplate } from './template/selectionQuestionTemplate';
 import { YesNoQuestionTemplate } from './template/yesNoQuestionTemplate';
 import { useNavigate } from 'react-router-dom';
-import { toOpenFiscaHousehold } from '../../state/convert';
+import { toFrontendHousehold, toOpenFiscaHousehold } from '../../state/convert';
 import { useEffect, useMemo } from 'react';
 import { AgeQuestionTemplate } from './template/ageQuestionTemplate';
 import { AmountOfMoneyQuestionTemplate } from './template/amountOfMoneyQuestionTemplate';
@@ -284,6 +285,9 @@ export const Question = ({
   const navigate = useNavigate();
   const currentDate = useRecoilValue(currentDateAtom);
   const [household, setHousehold] = useRecoilState(householdAtom);
+  const [frontendHousehold, setFrontendHousehold] = useRecoilState(
+    frontendHouseholdAtom
+  );
 
   // 進捗の分母計算（重いのでメモ化）
   const maxProgressMap = useMemo(() => {
@@ -314,7 +318,12 @@ export const Question = ({
         context: state.context,
         currentDate: currentDate,
       });
+      // 上記を除く、フロントエンド内で計算する対象支援制度を変換
+      const updatedFrontendHousehold = toFrontendHousehold({
+        context: state.context,
+      });
       setHousehold(updatedHousehold);
+      setFrontendHousehold(updatedFrontendHousehold);
 
       // 見積もり結果へ遷移
       navigate('/result', {
