@@ -45,7 +45,7 @@ export type QuestionEvent =
   | { type: 'back' }
   | { type: 'reset' };
 
-export type QustionState = StateValueFrom<typeof questionStateMachine>;
+type QustionState = StateValueFrom<typeof questionStateMachine>;
 
 export type ChangeMemberKey =
   | 'changeToSpouse'
