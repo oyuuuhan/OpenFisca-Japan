@@ -89,8 +89,6 @@ export const Result = () => {
 
   const [result, calculate] = useCalculate();
 
-  const frontendHouseholdResult = calculateFrontendHouseHold(frontendHousehold);
-
   const [shareLink, setShareLink] = useState(false);
   const [enviroment, setEnvironment] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>('');
@@ -299,13 +297,13 @@ export const Result = () => {
 
             <EmptyResults
               result={result}
-              frontendHouseholdResult={frontendHouseholdResult}
+              frontendHouseholdResult={frontendHousehold}
             />
             <Benefit result={result} />
             <Loan result={result} />
             <Applicable
               result={result}
-              frontendHouseholdResult={frontendHouseholdResult}
+              frontendHouseholdResult={frontendHousehold}
             />
 
             {/* 被災者支援制度モードは他の支援制度も探せるリンクを載せる */}
