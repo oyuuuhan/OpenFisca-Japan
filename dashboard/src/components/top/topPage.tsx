@@ -45,11 +45,19 @@ export function TopPage() {
     <>
       <VStack width="100%" overflowX="hidden">
         <HomeButton />
-        <VStack width="auto">
+      <VStack
+        w={{ base: '100%', md: 'auto' }}
+        maxW="100%"
+        boxSizing="border-box"
+        px={{ base: 4, md: 0 }}
+      >
           <Center>
             <Text
               color="cyan.900"
-              fontSize={configData.style.titleLogoFontSize}
+              fontSize={{
+                base: 'sm',
+                md: configData.style.subTitleFontSize,
+              }}
               fontWeight="bold"
               display="inline-block"
               textAlign="center"
@@ -88,7 +96,14 @@ export function TopPage() {
             />
           </Stack>
 
-          <Center pt={2} pb={1} pr={4} pl={4} style={{ textAlign: 'center' }}>
+          <Center
+            pt={2}
+            pb={1}
+            px={{ base: 4, md: 0 }}
+            w="100%"
+            boxSizing="border-box"
+            textAlign="center"
+          >
             <Button
               as={RouterLink}
               // 規約に同意していない場合のみモーダルが開く
@@ -101,12 +116,15 @@ export function TopPage() {
                       onModalOpen();
                     }
               }
-              fontSize={configData.style.subTitleFontSize}
+              fontSize={{
+                base: 'sm',
+                md: configData.style.subTitleFontSize,
+              }}
               borderRadius="xl"
-              pr="1em"
-              pl="1em"
+              px="1em"
               height="3.5em"
-              width="100%"
+              w="100%"
+              minW={0}
               bg="orange.400"
               color="white"
               _hover={{ bg: 'orange.500' }}
@@ -115,7 +133,15 @@ export function TopPage() {
             </Button>
           </Center>
 
-          <Center pr={4} pl={4} pb={1} style={{ textAlign: 'center' }}>
+          <Center
+            pb={1}
+            px={{ base: 4, md: 0 }}
+            w="100%"
+            boxSizing="border-box"
+            textAlign="center"
+            gap={2}
+            flexWrap="nowrap"
+          >
             <Button
               as={RouterLink}
               // 規約に同意していない場合のみモーダルが開く
@@ -128,13 +154,15 @@ export function TopPage() {
                       onModalOpen();
                     }
               }
-              style={{ marginRight: '1%' }}
-              fontSize={configData.style.subTitleFontSize}
+              fontSize={{
+                base: 'sm',
+                md: configData.style.subTitleFontSize,
+              }}
               borderRadius="xl"
               height="3.5em"
-              pr="1.2em"
-              pl="1.2em"
-              width="45%"
+              px={2}
+              flex={1}
+              minW={0}
               bg="teal.500"
               color="white"
               _hover={{ bg: 'teal.600' }}
@@ -142,6 +170,7 @@ export function TopPage() {
             >
               かんたん見積もり
             </Button>
+
             <Button
               as={RouterLink}
               // 規約に同意していない場合のみモーダルが開く
@@ -154,12 +183,15 @@ export function TopPage() {
                       onModalOpen();
                     }
               }
-              fontSize={configData.style.subTitleFontSize}
+              fontSize={{
+                base: 'sm',
+                md: configData.style.subTitleFontSize,
+              }}
               borderRadius="xl"
               height="3.5em"
-              pr="1.2em"
-              pl="1.2em"
-              width="45%"
+              px={2}
+              flex={1}
+              minW={0}
               bg="blue.500"
               color="white"
               _hover={{ bg: 'blue.600' }}
@@ -167,7 +199,6 @@ export function TopPage() {
             >
               くわしく見積もり
             </Button>
-            <br />
           </Center>
         </VStack>
         <Links />
